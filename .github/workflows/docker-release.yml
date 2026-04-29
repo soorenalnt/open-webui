@@ -1,0 +1,27 @@
+name: Build and Release Docker Image
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull image from GHCR
+        run: docker pull ghcr.io/open-webui/open-webui:main
+
+      - name: Save image as tar
+        run: docker save ghcr.io/open-webui/open-webui:main -o open-webui-docker.tar
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: open-webui-image
+          name: "Open WebUI Docker Image"
+          files: open-webui-docker.tar
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
